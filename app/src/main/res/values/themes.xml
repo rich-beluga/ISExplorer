@@ -1,0 +1,40 @@
+<resources>
+
+    <style name="Theme.ISExplorer" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.ISExplorer.Small</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.ISExplorer.Medium</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.ISExplorer.Large</item>
+
+        <item name="android:statusBarColor">?attr/colorSurface</item>
+        <item name="android:navigationBarColor">?attr/colorSurfaceContainer</item>
+
+        <item name="toolbarStyle">@style/Widget.Material3.Toolbar</item>
+    </style>
+
+    <style name="ShapeAppearance.ISExplorer" parent="ShapeAppearance.Material3.Corner.Small">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">8dp</item>
+    </style>
+
+    <style name="ShapeAppearance.ISExplorer.Small" parent="ShapeAppearance.ISExplorer" />
+
+    <style name="ShapeAppearance.ISExplorer.Medium" parent="ShapeAppearance.ISExplorer">
+        <item name="cornerSize">12dp</item>
+    </style>
+
+    <style name="ShapeAppearance.ISExplorer.Large" parent="ShapeAppearance.ISExplorer">
+        <item name="cornerSize">20dp</item>
+    </style>
+
+    <style name="ShapeAppearance.ISExplorer.IconContainer" parent="ShapeAppearance.ISExplorer">
+        <item name="cornerSize">10dp</item>
+    </style>
+
+    <style name="ShapeAppearance.ISExplorer.PathBar" parent="ShapeAppearance.ISExplorer">
+        <item name="cornerSizeBottomLeft">12dp</item>
+        <item name="cornerSizeBottomRight">12dp</item>
+        <item name="cornerSizeTopLeft">0dp</item>
+        <item name="cornerSizeTopRight">0dp</item>
+    </style>
+
+</resources>

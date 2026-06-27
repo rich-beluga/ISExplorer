@@ -1,0 +1,17 @@
+<resources>
+    <dimen name="corner_item_card">12dp</dimen>
+    <dimen name="corner_icon_box">10dp</dimen>
+    <dimen name="corner_path_bar">12dp</dimen>
+    <dimen name="corner_bottom_bar">16dp</dimen>
+
+    <dimen name="icon_container_size">40dp</dimen>
+    <dimen name="icon_drawable_size">20dp</dimen>
+
+    <dimen name="item_padding_h">12dp</dimen>
+    <dimen name="item_padding_v">10dp</dimen>
+    <dimen name="item_spacing">3dp</dimen>
+    <dimen name="item_side_margin">8dp</dimen>
+
+    <dimen name="bottom_bar_padding_v">8dp</dimen>
+    <dimen name="bottom_bar_padding_h">12dp</dimen>
+</resources>

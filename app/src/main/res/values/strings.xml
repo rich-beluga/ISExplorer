@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">ISExplorer</string>
+
+    <string name="action_copy">Копировать</string>
+    <string name="action_move">Переместить</string>
+    <string name="action_delete">Удалить</string>
+    <string name="action_cancel">Снять выделение</string>
+
+    <string name="delete_confirm_title">Удалить %d объект(-ов)?</string>
+    <string name="delete_confirm_message">Это действие необратимо.</string>
+    <string name="confirm_delete">Удалить</string>
+
+    <string name="toast_select_first">Сначала выделите файлы (долгое нажатие)</string>
+    <string name="toast_copied">Скопировано</string>
+    <string name="toast_moved">Перемещено</string>
+    <string name="toast_deleted">Удалено</string>
+
+    <string name="permission_required">Нужен доступ ко всем файлам. Откройте настройки и разрешите доступ.</string>
+
+    <string name="label_folder">Папка</string>
+    <string name="label_parent_dir">Родительская папка</string>
+</resources>

@@ -1,0 +1,153 @@
+package com.rich_beluga.isexplorer
+
+/*
+ * Реестр сопоставлений «расширение файла → FileCategory».
+ * File extension → FileCategory registry.
+ *
+ * КАК ДОБАВИТЬ НОВЫЙ ТИП / HOW TO ADD A NEW FILE TYPE:
+ *
+ *   1. (Опционально) Добавь иконку в res/drawable/ic_type_*.xml
+ *   2. (Опционально) Добавь константу в enum FileCategory с нужными цветами
+ *   3. Добавь строку в extensionMap ниже:
+ *        "расширение" to FileCategory.CATEGORY_NAME
+ *
+ * Расширения хранятся в НИЖНЕМ регистре — getCategory() приводит входящую
+ * строку к нижнему регистру перед поиском.
+ * Extensions are stored in lowercase; getCategory() lowercases the input first.
+ */
+object FileTypeRegistry {
+    private val extensionMap: Map<String, FileCategory> = mapOf(
+        "jpg"       to FileCategory.IMAGE,
+        "jpeg"      to FileCategory.IMAGE,
+        "png"       to FileCategory.IMAGE,
+        "gif"       to FileCategory.IMAGE,
+        "webp"      to FileCategory.IMAGE,
+        "svg"       to FileCategory.IMAGE,
+        "bmp"       to FileCategory.IMAGE,
+        "heic"      to FileCategory.IMAGE,
+        "heif"      to FileCategory.IMAGE,
+        "tiff"      to FileCategory.IMAGE,
+        "tif"       to FileCategory.IMAGE,
+        "avif"      to FileCategory.IMAGE,
+        "ico"       to FileCategory.IMAGE,
+        "raw"       to FileCategory.IMAGE,
+        "cr2"       to FileCategory.IMAGE,
+        "nef"       to FileCategory.IMAGE,
+
+        "mp4"       to FileCategory.VIDEO,
+        "mkv"       to FileCategory.VIDEO,
+        "avi"       to FileCategory.VIDEO,
+        "mov"       to FileCategory.VIDEO,
+        "webm"      to FileCategory.VIDEO,
+        "flv"       to FileCategory.VIDEO,
+        "m4v"       to FileCategory.VIDEO,
+        "3gp"       to FileCategory.VIDEO,
+        "ts"        to FileCategory.VIDEO,
+        "wmv"       to FileCategory.VIDEO,
+        "ogv"       to FileCategory.VIDEO,
+
+        "mp3"       to FileCategory.AUDIO,
+        "flac"      to FileCategory.AUDIO,
+        "ogg"       to FileCategory.AUDIO,
+        "wav"       to FileCategory.AUDIO,
+        "m4a"       to FileCategory.AUDIO,
+        "aac"       to FileCategory.AUDIO,
+        "opus"      to FileCategory.AUDIO,
+        "wma"       to FileCategory.AUDIO,
+        "ape"       to FileCategory.AUDIO,
+        "mid"       to FileCategory.AUDIO,
+        "midi"      to FileCategory.AUDIO,
+
+        "pdf"       to FileCategory.PDF,
+
+        "doc"       to FileCategory.DOCUMENT,
+        "docx"      to FileCategory.DOCUMENT,
+        "xls"       to FileCategory.DOCUMENT,
+        "xlsx"      to FileCategory.DOCUMENT,
+        "ppt"       to FileCategory.DOCUMENT,
+        "pptx"      to FileCategory.DOCUMENT,
+        "odt"       to FileCategory.DOCUMENT,
+        "ods"       to FileCategory.DOCUMENT,
+        "odp"       to FileCategory.DOCUMENT,
+        "rtf"       to FileCategory.DOCUMENT,
+        "pages"     to FileCategory.DOCUMENT,
+        "numbers"   to FileCategory.DOCUMENT,
+        "key"       to FileCategory.DOCUMENT,
+
+        "kt"        to FileCategory.CODE,
+        "kts"       to FileCategory.CODE,
+        "java"      to FileCategory.CODE,
+        "py"        to FileCategory.CODE,
+        "js"        to FileCategory.CODE,
+        "jsx"       to FileCategory.CODE,
+        "ts"        to FileCategory.CODE,
+        "tsx"       to FileCategory.CODE,
+        "rs"        to FileCategory.CODE,
+        "c"         to FileCategory.CODE,
+        "cpp"       to FileCategory.CODE,
+        "cc"        to FileCategory.CODE,
+        "h"         to FileCategory.CODE,
+        "hpp"       to FileCategory.CODE,
+        "go"        to FileCategory.CODE,
+        "rb"        to FileCategory.CODE,
+        "php"       to FileCategory.CODE,
+        "swift"     to FileCategory.CODE,
+        "sh"        to FileCategory.CODE,
+        "bash"      to FileCategory.CODE,
+        "fish"      to FileCategory.CODE,
+        "zsh"       to FileCategory.CODE,
+        "html"      to FileCategory.CODE,
+        "htm"       to FileCategory.CODE,
+        "css"       to FileCategory.CODE,
+        "scss"      to FileCategory.CODE,
+        "xml"       to FileCategory.CODE,
+        "json"      to FileCategory.CODE,
+        "jsonc"     to FileCategory.CODE,
+        "toml"      to FileCategory.CODE,
+        "yaml"      to FileCategory.CODE,
+        "yml"       to FileCategory.CODE,
+        "gradle"    to FileCategory.CODE,
+        "cmake"     to FileCategory.CODE,
+        "makefile"  to FileCategory.CODE,
+        "lua"       to FileCategory.CODE,
+        "r"         to FileCategory.CODE,
+        "dart"      to FileCategory.CODE,
+        "ex"        to FileCategory.CODE,
+        "exs"       to FileCategory.CODE,
+        "cs"        to FileCategory.CODE,
+        "sql"       to FileCategory.CODE,
+
+        "zip"           to FileCategory.ARCHIVE,
+        "tar"           to FileCategory.ARCHIVE,
+        "gz"            to FileCategory.ARCHIVE,
+        "bz2"           to FileCategory.ARCHIVE,
+        "xz"            to FileCategory.ARCHIVE,
+        "zst"           to FileCategory.ARCHIVE,
+        "7z"            to FileCategory.ARCHIVE,
+        "rar"           to FileCategory.ARCHIVE,
+        "lz4"           to FileCategory.ARCHIVE,
+        "lzma"          to FileCategory.ARCHIVE,
+        "deb"           to FileCategory.ARCHIVE,
+        "rpm"           to FileCategory.ARCHIVE,
+        "iso"           to FileCategory.ARCHIVE,
+
+        "apk"       to FileCategory.APK,
+        "aab"       to FileCategory.APK,
+        "xapk"      to FileCategory.APK,
+
+        "txt"       to FileCategory.TEXT,
+        "md"        to FileCategory.TEXT,
+        "markdown"  to FileCategory.TEXT,
+        "log"       to FileCategory.TEXT,
+        "ini"       to FileCategory.TEXT,
+        "conf"      to FileCategory.TEXT,
+        "cfg"       to FileCategory.TEXT,
+        "properties" to FileCategory.TEXT,
+        "env"       to FileCategory.TEXT,
+        "gitignore" to FileCategory.TEXT,
+        "editorconfig" to FileCategory.TEXT
+    )
+
+    fun getCategory(extension: String): FileCategory =
+        extensionMap[extension.lowercase()] ?: FileCategory.UNKNOWN
+}

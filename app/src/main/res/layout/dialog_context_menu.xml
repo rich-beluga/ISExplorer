@@ -38,8 +38,7 @@
         android:paddingBottom="12dp"
         android:textAppearance="?attr/textAppearanceTitleSmall"
         android:textColor="?attr/colorOnSurfaceVariant"
-        android:maxLines="2"
-        android:ellipsize="middle" />
+        android:maxLines="2" />
 
     
     <View

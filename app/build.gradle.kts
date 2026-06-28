@@ -35,6 +35,7 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.7.0")
 
     implementation("com.google.android.material:material:1.14.0-alpha08")
+    implementation("com.caverock:androidsvg-aar:1.4")
 
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("androidx.activity:activity-ktx:1.9.0")

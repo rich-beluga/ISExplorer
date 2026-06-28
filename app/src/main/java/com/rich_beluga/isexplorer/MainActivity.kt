@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
 import android.view.MenuInflater
+import android.graphics.drawable.PictureDrawable
 import android.view.View
 import android.widget.GridLayout
 import android.widget.ImageView
@@ -27,6 +28,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.R as MaterialR
+import com.caverock.androidsvg.SVG
 import com.rich_beluga.isexplorer.databinding.ActivityMainBinding
 import java.io.File
 import java.io.IOException
@@ -218,8 +220,14 @@ class MainActivity : AppCompatActivity() {
         val dialog   = BottomSheetDialog(this)
         val rootView = layoutInflater.inflate(R.layout.dialog_context_menu, null)
 
-        rootView.findViewById<ImageView>(R.id.ivIshakIcon).visibility =
-            if (showIshak) View.VISIBLE else View.GONE
+        rootView.findViewById<ImageView>(R.id.ivIshakIcon).apply {
+            if (showIshak) {
+                visibility = View.VISIBLE
+                loadIshakEasterIcon(this)
+            } else {
+                visibility = View.GONE
+            }
+        }
 
         rootView.findViewById<TextView>(R.id.tvMenuTitle).text = title
 
@@ -258,6 +266,18 @@ class MainActivity : AppCompatActivity() {
         dialog.setContentView(rootView)
         dialog.setOnCancelListener { onDismiss() }
         dialog.show()
+    }
+
+
+    private fun loadIshakEasterIcon(imageView: ImageView) {
+        try {
+            val svg = SVG.getFromAsset(assets, "emoji.svg")
+            imageView.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
+            imageView.setImageDrawable(PictureDrawable(svg.renderToPicture()))
+        } catch (_: Exception) {
+            imageView.setLayerType(View.LAYER_TYPE_NONE, null)
+            imageView.setImageResource(R.drawable.ic_ishak_easter)
+        }
     }
 
     private fun performOperation(files: List<File>, panel: FilePanelController, isMove: Boolean) {

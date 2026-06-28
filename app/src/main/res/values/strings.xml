@@ -4,13 +4,15 @@
     <string name="action_copy">Копировать</string>
     <string name="action_move">Переместить</string>
     <string name="action_delete">Удалить</string>
-    <string name="action_cancel">Снять выделение</string>
+    <string name="action_cancel">Отмена</string>
+    <string name="action_deselect">Снять выделение</string>
+
+    <string name="ctx_menu_title_multiple">Выбрано: %d файл(-ов)</string>
 
     <string name="delete_confirm_title">Удалить %d объект(-ов)?</string>
     <string name="delete_confirm_message">Это действие необратимо.</string>
     <string name="confirm_delete">Удалить</string>
 
-    <string name="toast_select_first">Сначала выделите файлы (долгое нажатие)</string>
     <string name="toast_copied">Скопировано</string>
     <string name="toast_moved">Перемещено</string>
     <string name="toast_deleted">Удалено</string>
@@ -19,4 +21,15 @@
 
     <string name="label_folder">Папка</string>
     <string name="label_parent_dir">Родительская папка</string>
+
+    <string name="ishak_pet">Погладить ишака</string>
+    <string name="ishak_feed">Покормить ишака</string>
+    <string name="ishak_ride">Оседлать ишака</string>
+    <string name="ishak_rename">Переименовать в «Буцефал»</string>
+    <string name="ishak_delete_action">Удалить (не жалко)</string>
+
+    <string name="ishak_toast_pet">Ишак доволен 🫏✨</string>
+    <string name="ishak_toast_feed">Ишак сыт и счастлив 🌾</string>
+    <string name="ishak_toast_ride">Поехали! И-А! 🫏💨</string>
+    <string name="ishak_toast_rename">Имя изменить нельзя, но звучит гордо!</string>
 </resources>

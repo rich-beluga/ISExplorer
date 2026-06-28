@@ -231,7 +231,7 @@ class MainActivity : AppCompatActivity() {
 
             cell.findViewById<ImageView>(R.id.ivActionIcon).apply {
                 setImageResource(action.iconRes)
-                val tintAttr = if (action.isDanger) MaterialR.attr.colorError
+                val tintAttr = if (action.isDanger) android.R.attr.colorError
                                else MaterialR.attr.colorOnSurface
                 imageTintList = ColorStateList.valueOf(resolveAttrColor(context, tintAttr))
             }
@@ -242,7 +242,7 @@ class MainActivity : AppCompatActivity() {
                     menuTitles.containsKey(action.actionId) -> menuTitles[action.actionId] ?: ""
                     else                        -> ""
                 }
-                val textAttr = if (action.isDanger) MaterialR.attr.colorError
+                val textAttr = if (action.isDanger) android.R.attr.colorError
                                else MaterialR.attr.colorOnSurface
                 setTextColor(resolveAttrColor(context, textAttr))
             }

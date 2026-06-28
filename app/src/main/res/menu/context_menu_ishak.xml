@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    ╔══════════════════════════════════════════════════════════╗
+    ║  🫏 ПАСХАЛЬНОЕ МЕНЮ ДЛЯ ФАЙЛОВ/ПАПОК С ИМЕНЕМ "ISHAK"  ║
+    ╚══════════════════════════════════════════════════════════╝
+
+    Это меню появляется ТОЛЬКО если файл или папка называется
+    "ishak" (в любом регистре: ISHAK, Ishak, iShAk и т.д.).
+
+    КАСТОМИЗАЦИЯ (именно за это отвечает этот файл):
+      • Добавь <item> — появится новый пункт в диалоге
+      • Удали <item> — пункт исчезнет
+      • Измени android:title — изменится текст пункта
+
+    Чтобы новый пункт ЧТО-ТО ДЕЛАЛ:
+      → Добавь обработку его android:id в MainActivity.handleIshakMenuAction()
+-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/ishak_pet"
+        android:title="@string/ishak_pet" />
+
+    <item android:id="@+id/ishak_feed"
+        android:title="@string/ishak_feed" />
+
+    <item android:id="@+id/ishak_ride"
+        android:title="@string/ishak_ride" />
+
+    <item android:id="@+id/ishak_rename"
+        android:title="@string/ishak_rename" />
+
+    <!--
+        Этот пункт реально удаляет файл (с подтверждением).
+        Убери его, если не хочешь опасной кнопки в пасхалке.
+    -->
+    <item android:id="@+id/ishak_delete"
+        android:title="@string/ishak_delete_action" />
+
+</menu>

@@ -16,6 +16,7 @@ import java.util.Date
 
 class FileAdapter(
     private val onItemClick: (FileItem) -> Unit,
+
     private val onItemLongClick: (anchorView: View, item: FileItem, position: Int) -> Boolean
 ) : RecyclerView.Adapter<FileAdapter.ViewHolder>() {
 
@@ -124,6 +125,7 @@ class FileAdapter(
 
         holder.itemView.setOnClickListener { onItemClick(item) }
         holder.itemView.setOnLongClickListener { view ->
+
             val pos = holder.bindingAdapterPosition
             if (pos == RecyclerView.NO_POSITION) return@setOnLongClickListener false
             onItemLongClick(view, item, pos)

@@ -8,7 +8,7 @@ import java.nio.channels.FileChannel;
 
 public final class FileOperationsUtil {
 
-    private FileOperationsUtil() { /* тут нихуя нету */ }
+    private FileOperationsUtil() {  }
 
     public static void copy(File source, File targetDir) throws IOException {
         File destination = new File(targetDir, source.getName());

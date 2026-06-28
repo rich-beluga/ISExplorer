@@ -27,6 +27,7 @@ class FilePanelController(
 ) {
 
     companion object {
+
         private const val MIN_LOADING_VISIBLE_MS = 350L
     }
 
@@ -38,9 +39,11 @@ class FilePanelController(
 
     private val dragHelper = DragSelectTouchHelper().also { helper ->
         helper.onRangeSelect = { start, end ->
+
             adapter.setRangeSelected(start, end)
         }
         helper.onDragEnd = {
+
         }
     }
 
@@ -119,6 +122,7 @@ class FilePanelController(
             selectionMode = true
             adapter.setSelectionModeEnabled(true)
         }
+
         adapter.setItemSelected(position, true)
 
         dragHelper.startDragSelect(position)

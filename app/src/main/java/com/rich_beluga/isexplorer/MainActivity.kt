@@ -125,7 +125,6 @@ class MainActivity : AppCompatActivity() {
         val title = if (selectedFiles.size == 1) selectedFiles.first().name
                     else getString(R.string.ctx_menu_title_multiple, selectedFiles.size)
 
-        /* TODO: добавить больше операций над файлами/директориями */
         val actions = listOf(
             ContextAction(R.drawable.ic_action_copy,   R.string.action_copy,     R.id.ctx_copy),
             ContextAction(R.drawable.ic_action_move,   R.string.action_move,     R.id.ctx_move),
@@ -155,18 +154,22 @@ class MainActivity : AppCompatActivity() {
         val selectedFiles = sourcePanel.getSelectedFiles().ifEmpty { listOf(item.file) }
 
         val tempPopup = PopupMenu(this, binding.root)
-        MenuInflater(this).inflate(R.menu.context_menu_text, tempPopup.menu)
+        MenuInflater(this).inflate(R.menu.context_menu_test, tempPopup.menu)
         val menu = tempPopup.menu
 
         val actions = buildList {
+
             for (i in 0 until menu.size()) {
                 val mi = menu.getItem(i)
+
                 val icon     = if (mi.itemId == R.id.ishak_delete) R.drawable.ic_action_delete
                                else                                  R.drawable.ic_ishak_easter
                 val isDanger = mi.itemId == R.id.ishak_delete
                 add(ContextAction(icon, 0, mi.itemId, isDanger).copy(
+
                 ))
             }
+
             add(ContextAction(R.drawable.ic_action_copy,   R.string.action_copy,   R.id.ctx_copy))
             add(ContextAction(R.drawable.ic_action_move,   R.string.action_move,   R.id.ctx_move))
             add(ContextAction(R.drawable.ic_action_delete, R.string.action_delete, R.id.ctx_delete, isDanger = true))
@@ -182,7 +185,9 @@ class MainActivity : AppCompatActivity() {
             showIshak = true,
             onAction  = { id ->
                 when {
+
                     menuTitles.containsKey(id) -> handleIshakMenuAction(id, item, sourcePanel)
+
                     else -> handleNormalMenuAction(id, selectedFiles, sourcePanel)
                 }
             },

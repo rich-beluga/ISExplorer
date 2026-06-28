@@ -34,10 +34,12 @@ class DragSelectTouchHelper : RecyclerView.OnItemTouchListener {
 
         return when (e.action) {
             MotionEvent.ACTION_MOVE -> {
+
                 updateSelection(rv, e)
                 true
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+
                 endDrag()
                 false
             }
@@ -46,6 +48,7 @@ class DragSelectTouchHelper : RecyclerView.OnItemTouchListener {
     }
 
     override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {
+
         when (e.action) {
             MotionEvent.ACTION_MOVE  -> updateSelection(rv, e)
             MotionEvent.ACTION_UP,
@@ -54,6 +57,7 @@ class DragSelectTouchHelper : RecyclerView.OnItemTouchListener {
     }
 
     override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
+
     }
 
     private fun updateSelection(rv: RecyclerView, e: MotionEvent) {

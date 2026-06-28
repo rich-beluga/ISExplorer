@@ -4,20 +4,6 @@ import androidx.annotation.AttrRes
 import androidx.annotation.DrawableRes
 import com.google.android.material.R as MaterialR
 
-/**
- * Перечисление файловых категорий — каждая категория содержит:
- *  • иконку (drawable res)
- *  • цвет контейнера иконки (containerColorAttr) — из Monet/M3 палитры
- *  • цвет самой иконки    (onContainerColorAttr) — всегда "on-<container>"
- *
- * File category enum — each entry holds:
- *  • icon drawable resource
- *  • icon box background color attribute (M3 container color role)
- *  • icon tint color attribute           (M3 on-container color role)
- *
- * Чтобы добавить новый тип: добавь значение в этот enum и запись в FileTypeRegistry.
- * To add a new type: add an entry here and a mapping in FileTypeRegistry.
- */
 enum class FileCategory(
     @DrawableRes val iconRes: Int,
     @AttrRes  val containerColorAttr: Int,

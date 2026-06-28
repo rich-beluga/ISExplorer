@@ -4,13 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:fitsSystemWindows="true"
     android:background="?attr/colorSurface">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize"
         android:background="?attr/colorSurfaceContainer"
         app:title="@string/app_name"
         app:titleTextAppearance="?attr/textAppearanceTitleLarge" />
@@ -21,82 +21,13 @@
         android:layout_weight="1"
         android:orientation="horizontal">
 
-        <include
-            android:id="@+id/panelLeft"
-            layout="@layout/panel_layout" />
+        <include android:id="@+id/panelLeft"  layout="@layout/panel_layout" />
 
         <View
             android:layout_width="1dp"
             android:layout_height="match_parent"
             android:background="?attr/colorOutlineVariant" />
 
-        <include
-            android:id="@+id/panelRight"
-            layout="@layout/panel_layout" />
-
+        <include android:id="@+id/panelRight" layout="@layout/panel_layout" />
     </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/bottomBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="?attr/colorSurfaceContainer"
-        android:elevation="3dp">
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="?attr/colorOutlineVariant" />
-
-        <HorizontalScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:scrollbars="none"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="8dp">
-
-            <com.google.android.material.chip.ChipGroup
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:singleLine="true"
-                app:chipSpacingHorizontal="8dp">
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chipCopy"
-                    style="@style/Widget.Material3.Chip.Assist"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/action_copy"
-                    app:chipIcon="@drawable/ic_action_copy" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chipMove"
-                    style="@style/Widget.Material3.Chip.Assist"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/action_move"
-                    app:chipIcon="@drawable/ic_action_move" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chipDelete"
-                    style="@style/Widget.Material3.Chip.Assist"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/action_delete"
-                    app:chipIcon="@drawable/ic_action_delete"
-                    app:chipIconTint="?attr/colorError" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chipCancel"
-                    style="@style/Widget.Material3.Chip.Assist"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/action_cancel"
-                    app:chipIcon="@drawable/ic_action_cancel" />
-
-            </com.google.android.material.chip.ChipGroup>
-        </HorizontalScrollView>
-    </LinearLayout>
-
 </LinearLayout>

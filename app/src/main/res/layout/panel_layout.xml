@@ -47,7 +47,5 @@
             android:contentDescription="Загрузка..."
             app:indicatorColor="?attr/colorOnPrimaryContainer"
             app:containerColor="?attr/colorPrimaryContainer" />
-
     </FrameLayout>
-
 </LinearLayout>

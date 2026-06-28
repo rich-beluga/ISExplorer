@@ -135,7 +135,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         showActionsBottomSheet(
-            title      = title,
+            title      = "Selected: ${item.file.name}",
             actions    = actions,
             showIshak  = false,
             onAction   = { id -> handleNormalMenuAction(id, selectedFiles, sourcePanel) },
@@ -160,21 +160,10 @@ class MainActivity : AppCompatActivity() {
         val menu = tempPopup.menu
 
         val actions = buildList {
-
-            for (i in 0 until menu.size()) {
-                val mi = menu.getItem(i)
-
-                val icon     = if (mi.itemId == R.id.ishak_delete) R.drawable.ic_action_delete
-                               else                                  R.drawable.ic_ishak_easter
-                val isDanger = mi.itemId == R.id.ishak_delete
-                add(ContextAction(icon, 0, mi.itemId, isDanger).copy(
-
-                ))
-            }
-
             add(ContextAction(R.drawable.ic_action_copy,   R.string.action_copy,   R.id.ctx_copy))
             add(ContextAction(R.drawable.ic_action_move,   R.string.action_move,   R.id.ctx_move))
             add(ContextAction(R.drawable.ic_action_delete, R.string.action_delete, R.id.ctx_delete, isDanger = true))
+            add(ContextAction(R.drawable.ic_action_cancel, R.string.action_deselect, R.id.ctx_deselect))
         }
 
         val menuTitles = (0 until menu.size()).associate { i ->
@@ -182,14 +171,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         showActionsBottomSheet(
-            title     = "🫏 ${item.file.name}",
+            title     = "Main dev: @rich_beluga\nSelected: ${item.file.name}",
             actions   = actions,
             showIshak = true,
             onAction  = { id ->
                 when {
-
                     menuTitles.containsKey(id) -> handleIshakMenuAction(id, item, sourcePanel)
-
                     else -> handleNormalMenuAction(id, selectedFiles, sourcePanel)
                 }
             },

@@ -3,17 +3,15 @@ package com.rich_beluga.isexplorer
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
+import android.graphics.drawable.PictureDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
-import android.view.MenuInflater
-import android.graphics.drawable.PictureDrawable
 import android.view.View
 import android.widget.GridLayout
 import android.widget.ImageView
-import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.addCallback
@@ -24,11 +22,11 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
+import com.caverock.androidsvg.SVG
+import com.google.android.material.R as MaterialR
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.R as MaterialR
-import com.caverock.androidsvg.SVG
 import com.rich_beluga.isexplorer.databinding.ActivityMainBinding
 import java.io.File
 import java.io.IOException
@@ -44,7 +42,7 @@ class MainActivity : AppCompatActivity() {
     private var activePanel: FilePanelController? = null
 
     private data class ContextAction(
-        val iconRes:  Int,
+        val iconRes: Int,
         val labelRes: Int,
         val actionId: Int,
         val isDanger: Boolean = false
@@ -67,7 +65,7 @@ class MainActivity : AppCompatActivity() {
         val isDark = (resources.configuration.uiMode and
                 Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
         WindowInsetsControllerCompat(window, window.decorView).apply {
-            isAppearanceLightStatusBars     = !isDark
+            isAppearanceLightStatusBars = !isDark
             isAppearanceLightNavigationBars = !isDark
         }
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, wi ->
@@ -80,22 +78,28 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupPanels() {
         leftPanel = FilePanelController(
-            recyclerView     = binding.panelLeft.recyclerView,
-            pathView         = binding.panelLeft.textPath,
+            recyclerView = binding.panelLeft.recyclerView,
+            pathView = binding.panelLeft.textPath,
             loadingIndicator = binding.panelLeft.loadingIndicator,
-            initialPath      = defaultPath,
-            scope            = lifecycleScope,
-            onActivated      = { setActivePanel(it) },
-            onContextMenu    = { view, item, panel -> showContextMenu(view, item, panel) }
+            clearSelectionChip = binding.panelLeft.chipClearSelection,
+            initialPath = defaultPath,
+            scope = lifecycleScope,
+            onActivated = { setActivePanel(it) },
+            onContextMenu = { _, trigger, files, panel ->
+                showContextMenu(trigger, files, panel)
+            }
         )
         rightPanel = FilePanelController(
-            recyclerView     = binding.panelRight.recyclerView,
-            pathView         = binding.panelRight.textPath,
+            recyclerView = binding.panelRight.recyclerView,
+            pathView = binding.panelRight.textPath,
             loadingIndicator = binding.panelRight.loadingIndicator,
-            initialPath      = defaultPath,
-            scope            = lifecycleScope,
-            onActivated      = { setActivePanel(it) },
-            onContextMenu    = { view, item, panel -> showContextMenu(view, item, panel) }
+            clearSelectionChip = binding.panelRight.chipClearSelection,
+            initialPath = defaultPath,
+            scope = lifecycleScope,
+            onActivated = { setActivePanel(it) },
+            onContextMenu = { _, trigger, files, panel ->
+                showContextMenu(trigger, files, panel)
+            }
         )
         setActivePanel(leftPanel)
     }
@@ -110,90 +114,74 @@ class MainActivity : AppCompatActivity() {
 
     private fun isIshakTarget(item: FileItem): Boolean {
         if (item.isParentLink) return false
-        return if (item.isDirectory) {
-            item.file.name.equals("ishak", ignoreCase = true)
+        return if (item.isDirectory) item.file.name.equals("ishak", ignoreCase = true)
+        else item.file.nameWithoutExtension.equals("ishak", ignoreCase = true)
+    }
+
+    private fun showContextMenu(
+        triggerItem: FileItem?,
+        filesToOperate: List<File>,
+        panel: FilePanelController
+    ) {
+        val ishakItem = triggerItem?.takeIf { isIshakTarget(it) }
+        if (ishakItem != null) showIshakContextMenu(ishakItem, filesToOperate, panel)
+        else showNormalContextMenu(filesToOperate, panel)
+    }
+
+    private fun showNormalContextMenu(
+        filesToOperate: List<File>,
+        sourcePanel: FilePanelController
+    ) {
+        val title = if (filesToOperate.size == 1) {
+            filesToOperate.first().name
         } else {
-            item.file.nameWithoutExtension.equals("ishak", ignoreCase = true)
+            getString(R.string.ctx_menu_title_multiple, filesToOperate.size)
         }
-    }
-
-    private fun showContextMenu(anchorView: View, item: FileItem, panel: FilePanelController) {
-        if (isIshakTarget(item)) showIshakContextMenu(item, panel)
-        else                      showNormalContextMenu(item, panel)
-    }
-
-    private fun showNormalContextMenu(item: FileItem, sourcePanel: FilePanelController) {
-        val selectedFiles = sourcePanel.getSelectedFiles().ifEmpty { listOf(item.file) }
-        val title = if (selectedFiles.size == 1) selectedFiles.first().name
-                    else getString(R.string.ctx_menu_title_multiple, selectedFiles.size)
 
         val actions = listOf(
-            ContextAction(R.drawable.ic_action_copy,   R.string.action_copy,     R.id.ctx_copy),
-            ContextAction(R.drawable.ic_action_move,   R.string.action_move,     R.id.ctx_move),
-            ContextAction(R.drawable.ic_action_delete, R.string.action_delete,   R.id.ctx_delete,   isDanger = true),
+            ContextAction(R.drawable.ic_action_copy, R.string.action_copy, R.id.ctx_copy),
+            ContextAction(R.drawable.ic_action_move, R.string.action_move, R.id.ctx_move),
+            ContextAction(R.drawable.ic_action_delete, R.string.action_delete, R.id.ctx_delete, isDanger = true),
             ContextAction(R.drawable.ic_action_cancel, R.string.action_deselect, R.id.ctx_deselect)
         )
 
         showActionsBottomSheet(
-            title      = "Selected: ${item.file.name}",
-            actions    = actions,
-            showIshak  = false,
-            onAction   = { id -> handleNormalMenuAction(id, selectedFiles, sourcePanel) },
-            onDismiss  = { sourcePanel.exitSelectionMode() }
+            title = title,
+            actions = actions,
+            showIshak = false,
+            onAction = { id -> handleNormalMenuAction(id, filesToOperate, sourcePanel) },
+            onDismiss = { }
         )
     }
 
     private fun handleNormalMenuAction(id: Int, files: List<File>, panel: FilePanelController) {
         when (id) {
-            R.id.ctx_copy     -> performOperation(files, panel, isMove = false)
-            R.id.ctx_move     -> performOperation(files, panel, isMove = true)
-            R.id.ctx_delete   -> confirmDelete(files, panel)
+            R.id.ctx_copy -> performOperation(files, panel, isMove = false)
+            R.id.ctx_move -> performOperation(files, panel, isMove = true)
+            R.id.ctx_delete -> confirmDelete(files, panel)
             R.id.ctx_deselect -> panel.exitSelectionMode()
         }
     }
 
-    private fun showIshakContextMenu(item: FileItem, sourcePanel: FilePanelController) {
-        val selectedFiles = sourcePanel.getSelectedFiles().ifEmpty { listOf(item.file) }
-
-        val tempPopup = PopupMenu(this, binding.root)
-        MenuInflater(this).inflate(R.menu.context_menu_test, tempPopup.menu)
-        val menu = tempPopup.menu
-
-        val actions = buildList {
-            add(ContextAction(R.drawable.ic_action_copy,   R.string.action_copy,   R.id.ctx_copy))
-            add(ContextAction(R.drawable.ic_action_move,   R.string.action_move,   R.id.ctx_move))
-            add(ContextAction(R.drawable.ic_action_delete, R.string.action_delete, R.id.ctx_delete, isDanger = true))
-            add(ContextAction(R.drawable.ic_action_cancel, R.string.action_deselect, R.id.ctx_deselect))
-        }
-
-        val menuTitles = (0 until menu.size()).associate { i ->
-            menu.getItem(i).itemId to (menu.getItem(i).title?.toString() ?: "")
-        }
+    private fun showIshakContextMenu(
+        ishakItem: FileItem,
+        filesToOperate: List<File>,
+        sourcePanel: FilePanelController
+    ) {
+        val actions = listOf(
+            ContextAction(R.drawable.ic_action_copy, R.string.action_copy, R.id.ctx_copy),
+            ContextAction(R.drawable.ic_action_move, R.string.action_move, R.id.ctx_move),
+            ContextAction(R.drawable.ic_action_delete, R.string.action_delete, R.id.ctx_delete, isDanger = true),
+            ContextAction(R.drawable.ic_action_cancel, R.string.action_deselect, R.id.ctx_deselect)
+        )
 
         showActionsBottomSheet(
-            title     = "Main dev: @rich_beluga\nSelected: ${item.file.name}",
-            actions   = actions,
+            title = "Main dev: @rich_beluga\n${ishakItem.file.name}",
+            actions = actions,
             showIshak = true,
-            onAction  = { id ->
-                when {
-                    menuTitles.containsKey(id) -> handleIshakMenuAction(id, item, sourcePanel)
-                    else -> handleNormalMenuAction(id, selectedFiles, sourcePanel)
-                }
-            },
-            onDismiss = { sourcePanel.exitSelectionMode() },
-            menuTitles = menuTitles
+            onAction = { id -> handleNormalMenuAction(id, filesToOperate, sourcePanel) },
+            onDismiss = { }
         )
-    }
-
-    private fun handleIshakMenuAction(id: Int, item: FileItem, panel: FilePanelController) {
-        when (id) {
-            R.id.ishak_pet    -> toast(getString(R.string.ishak_toast_pet))
-            R.id.ishak_feed   -> toast(getString(R.string.ishak_toast_feed))
-            R.id.ishak_ride   -> toast(getString(R.string.ishak_toast_ride))
-            R.id.ishak_rename -> toast(getString(R.string.ishak_toast_rename))
-            R.id.ishak_delete -> { confirmDelete(listOf(item.file), panel); return }
-        }
-        panel.exitSelectionMode()
     }
 
     private fun showActionsBottomSheet(
@@ -201,10 +189,9 @@ class MainActivity : AppCompatActivity() {
         actions: List<ContextAction>,
         showIshak: Boolean,
         onAction: (id: Int) -> Unit,
-        onDismiss: () -> Unit,
-        menuTitles: Map<Int, String> = emptyMap()
+        onDismiss: () -> Unit
     ) {
-        val dialog   = BottomSheetDialog(this)
+        val dialog = BottomSheetDialog(this)
         val rootView = layoutInflater.inflate(R.layout.dialog_context_menu, null)
 
         rootView.findViewById<ImageView>(R.id.ivIshakIcon).apply {
@@ -227,18 +214,14 @@ class MainActivity : AppCompatActivity() {
             cell.findViewById<ImageView>(R.id.ivActionIcon).apply {
                 setImageResource(action.iconRes)
                 val tintAttr = if (action.isDanger) android.R.attr.colorError
-                               else MaterialR.attr.colorOnSurface
+                else MaterialR.attr.colorOnSurface
                 imageTintList = ColorStateList.valueOf(resolveAttrColor(context, tintAttr))
             }
 
             cell.findViewById<TextView>(R.id.tvActionLabel).apply {
-                text = when {
-                    action.labelRes != 0        -> getString(action.labelRes)
-                    menuTitles.containsKey(action.actionId) -> menuTitles[action.actionId] ?: ""
-                    else                        -> ""
-                }
+                text = getString(action.labelRes)
                 val textAttr = if (action.isDanger) android.R.attr.colorError
-                               else MaterialR.attr.colorOnSurface
+                else MaterialR.attr.colorOnSurface
                 setTextColor(resolveAttrColor(context, textAttr))
             }
 
@@ -255,7 +238,6 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 
-
     private fun loadIshakEasterIcon(imageView: ImageView) {
         try {
             val svg = SVG.getFromAsset(assets, "emoji.svg")
@@ -263,7 +245,7 @@ class MainActivity : AppCompatActivity() {
             imageView.setImageDrawable(PictureDrawable(svg.renderToPicture()))
         } catch (_: Exception) {
             imageView.setLayerType(View.LAYER_TYPE_NONE, null)
-            imageView.setImageResource(R.drawable.ic_ishak_easter)
+            imageView.setImageResource(android.R.drawable.sym_def_app_icon)
         }
     }
 
@@ -272,12 +254,17 @@ class MainActivity : AppCompatActivity() {
         thread {
             var err: String? = null
             for (f in files) try {
-                if (isMove) FileOperationsUtil.move(f, dest) else FileOperationsUtil.copy(f, dest)
-            } catch (e: IOException) { err = e.message }
+                if (isMove) FileOperationsUtil.move(f, dest)
+                else FileOperationsUtil.copy(f, dest)
+            } catch (e: IOException) {
+                err = e.message
+            }
             runOnUiThread {
-                leftPanel.refresh(); rightPanel.refresh()
+                leftPanel.refresh()
+                rightPanel.refresh()
                 panel.exitSelectionMode()
-                toast(err ?: if (isMove) getString(R.string.toast_moved) else getString(R.string.toast_copied))
+                toast(err ?: if (isMove) getString(R.string.toast_moved)
+                else getString(R.string.toast_copied))
             }
         }
     }
@@ -289,26 +276,36 @@ class MainActivity : AppCompatActivity() {
             .setPositiveButton(R.string.confirm_delete) { _, _ ->
                 thread {
                     var err: String? = null
-                    for (f in files) try { FileOperationsUtil.deleteRecursively(f) }
-                                      catch (e: IOException) { err = e.message }
+                    for (f in files) try {
+                        FileOperationsUtil.deleteRecursively(f)
+                    } catch (e: IOException) {
+                        err = e.message
+                    }
                     runOnUiThread {
-                        leftPanel.refresh(); rightPanel.refresh()
+                        leftPanel.refresh()
+                        rightPanel.refresh()
                         panel.exitSelectionMode()
                         toast(err ?: getString(R.string.toast_deleted))
                     }
                 }
             }
-            .setNegativeButton(R.string.action_cancel) { _, _ -> panel.exitSelectionMode() }
+            .setNegativeButton(R.string.action_cancel) { _, _ -> }
             .show()
     }
 
     private fun setupBackNavigation() {
         onBackPressedDispatcher.addCallback(this) {
             val panel = activePanel ?: leftPanel
-            if (panel.selectionMode) { panel.exitSelectionMode(); return@addCallback }
+            if (panel.selectionMode) {
+                panel.exitSelectionMode()
+                return@addCallback
+            }
             val parent = panel.currentDir.parentFile
             if (parent != null) panel.loadDirectory(parent)
-            else { isEnabled = false; onBackPressedDispatcher.onBackPressed() }
+            else {
+                isEnabled = false
+                onBackPressedDispatcher.onBackPressed()
+            }
         }
     }
 
@@ -316,13 +313,16 @@ class MainActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
             toast(getString(R.string.permission_required))
             try {
-                startActivity(Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
-                    Uri.parse("package:$packageName")))
+                startActivity(Intent(
+                    Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+                    Uri.parse("package:$packageName")
+                ))
             } catch (e: Exception) {
                 startActivity(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION))
             }
         }
     }
 
-    private fun toast(msg: String) = Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+    private fun toast(msg: String) =
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
 }

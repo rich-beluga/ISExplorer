@@ -16,8 +16,7 @@ import java.util.Date
 
 class FileAdapter(
     private val onItemClick: (FileItem) -> Unit,
-
-    private val onItemLongClick: (anchorView: View, item: FileItem, position: Int) -> Boolean
+    private val onItemLongClick: (anchorView: View, item: FileItem) -> Boolean
 ) : RecyclerView.Adapter<FileAdapter.ViewHolder>() {
 
     private val items         = mutableListOf<FileItem>()
@@ -67,19 +66,20 @@ class FileAdapter(
 
     fun isAnySelected(): Boolean = selectedItems.isNotEmpty()
 
+    fun isItemSelected(item: FileItem): Boolean = selectedItems.contains(item)
+
     fun getItemAt(position: Int): FileItem? = items.getOrNull(position)
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val card: MaterialCardView  = view as MaterialCardView
+        val card: MaterialCardView     = view as MaterialCardView
         val iconContainer: FrameLayout = view.findViewById(R.id.iconContainer)
-        val imageIcon: ImageView    = view.findViewById(R.id.imageIcon)
-        val textName: TextView      = view.findViewById(R.id.textName)
-        val textInfo: TextView      = view.findViewById(R.id.textInfo)
+        val imageIcon: ImageView       = view.findViewById(R.id.imageIcon)
+        val textName: TextView         = view.findViewById(R.id.textName)
+        val textInfo: TextView         = view.findViewById(R.id.textInfo)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_file, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_file, parent, false)
         return ViewHolder(view)
     }
 
@@ -101,13 +101,12 @@ class FileAdapter(
         holder.imageIcon.setImageResource(category.iconRes)
         holder.imageIcon.imageTintList = ColorStateList.valueOf(onContainerColor)
 
-        val isSelected = selectionModeEnabled && !item.isParentLink && selectedItems.contains(item)
-
+        val isSelected   = selectionModeEnabled && !item.isParentLink && selectedItems.contains(item)
         val targetBgAttr = if (isSelected) MaterialR.attr.colorSecondaryContainer
-                           else             MaterialR.attr.colorSurfaceContainerLow
+                           else MaterialR.attr.colorSurfaceContainerLow
         val targetBg     = resolveAttrColor(ctx, targetBgAttr)
         val targetStroke = if (isSelected) resolveAttrColor(ctx, MaterialR.attr.colorSecondary)
-                           else            0x00000000
+                           else 0x00000000
 
         val currentBg = holder.card.cardBackgroundColor?.defaultColor
             ?: resolveAttrColor(ctx, MaterialR.attr.colorSurfaceContainerLow)
@@ -124,12 +123,7 @@ class FileAdapter(
         holder.card.strokeColor = targetStroke
 
         holder.itemView.setOnClickListener { onItemClick(item) }
-        holder.itemView.setOnLongClickListener { view ->
-
-            val pos = holder.bindingAdapterPosition
-            if (pos == RecyclerView.NO_POSITION) return@setOnLongClickListener false
-            onItemLongClick(view, item, pos)
-        }
+        holder.itemView.setOnLongClickListener { view -> onItemLongClick(view, item) }
     }
 
     override fun getItemCount(): Int = items.size
@@ -142,8 +136,7 @@ class FileAdapter(
             bytes < 1_073_741_824 -> "%.1f МБ".format(bytes / 1_048_576.0)
             else                  -> "%.2f ГБ".format(bytes / 1_073_741_824.0)
         }
-        val dateText = DateFormat.getDateInstance(DateFormat.SHORT)
-            .format(Date(item.file.lastModified()))
+        val dateText = DateFormat.getDateInstance(DateFormat.SHORT).format(Date(item.file.lastModified()))
         return "$sizeText • $dateText"
     }
 }

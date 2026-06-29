@@ -1,12 +1,15 @@
 package com.rich_beluga.isexplorer
 
 import android.animation.ValueAnimator
+import android.graphics.Canvas
 import android.graphics.Rect
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.TextView
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.chip.Chip
 import com.google.android.material.loadingindicator.LoadingIndicator
 import com.google.android.material.R as MaterialR
 import kotlinx.coroutines.CoroutineScope
@@ -20,60 +23,119 @@ class FilePanelController(
     private val recyclerView: RecyclerView,
     private val pathView: TextView,
     private val loadingIndicator: LoadingIndicator,
+    private val clearSelectionChip: Chip,
     initialPath: String,
     private val scope: CoroutineScope,
     private val onActivated: (FilePanelController) -> Unit,
-    private val onContextMenu: (anchorView: View, item: FileItem, panel: FilePanelController) -> Unit
+    private val onContextMenu: (
+        anchorView: View,
+        triggerItem: FileItem?,
+        filesToOperate: List<File>,
+        panel: FilePanelController
+    ) -> Unit
 ) {
 
     companion object {
-
         private const val MIN_LOADING_VISIBLE_MS = 350L
     }
 
-    var currentDir: File = File(initialPath)
+    var currentDir: File = File("/storage/emulated/0/")
         private set
 
     var selectionMode: Boolean = false
         private set
 
-    private val dragHelper = DragSelectTouchHelper().also { helper ->
-        helper.onRangeSelect = { start, end ->
+    private val adapter = FileAdapter(
+        onItemClick     = { item       -> handleItemClick(item) },
+        onItemLongClick = { view, item -> handleItemLongClick(view, item) }
+    )
 
-            adapter.setRangeSelected(start, end)
+    private val swipeCallback = object : ItemTouchHelper.SimpleCallback(
+        0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+    ) {
+        override fun onMove(rv: RecyclerView, vh: RecyclerView.ViewHolder, t: RecyclerView.ViewHolder) = false
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+            val pos  = viewHolder.bindingAdapterPosition
+            if (pos == RecyclerView.NO_POSITION) return
+            val item = adapter.getItemAt(pos) ?: return
+
+            if (item.isParentLink) {
+                adapter.notifyItemChanged(pos)
+                return
+            }
+
+            onActivated(this@FilePanelController)
+
+            if (!selectionMode) {
+                selectionMode = true
+                adapter.setSelectionModeEnabled(true)
+            }
+            adapter.toggleSelection(item)
+
+            if (!adapter.isAnySelected()) {
+                exitSelectionMode()
+            }
+
+            adapter.notifyItemChanged(pos)
+            updateClearChip()
         }
-        helper.onDragEnd = {
 
+        override fun getMovementFlags(rv: RecyclerView, vh: RecyclerView.ViewHolder): Int {
+            val pos  = vh.bindingAdapterPosition
+            val item = if (pos != RecyclerView.NO_POSITION) adapter.getItemAt(pos) else null
+            if (item?.isParentLink == true) return 0
+            return makeMovementFlags(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT)
+        }
+
+        override fun getSwipeThreshold(viewHolder: RecyclerView.ViewHolder) = 0.2f
+
+        override fun getSwipeEscapeVelocity(defaultValue: Float) = defaultValue * 2.5f
+
+        override fun onChildDraw(
+            c: Canvas, rv: RecyclerView, vh: RecyclerView.ViewHolder,
+            dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean
+        ) {
+            if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                val fraction = (kotlin.math.abs(dX) / vh.itemView.width).coerceIn(0f, 1f)
+                vh.itemView.alpha = 1f - fraction * 0.35f
+                super.onChildDraw(c, rv, vh, dX * 0.55f, dY, actionState, isCurrentlyActive)
+            } else {
+                super.onChildDraw(c, rv, vh, dX, dY, actionState, isCurrentlyActive)
+            }
+        }
+
+        override fun clearView(rv: RecyclerView, vh: RecyclerView.ViewHolder) {
+            super.clearView(rv, vh)
+            vh.itemView.alpha = 1f
         }
     }
 
-    private val adapter = FileAdapter(
-        onItemClick     = { item           -> handleItemClick(item) },
-        onItemLongClick = { view, item, pos -> handleItemLongClick(view, item, pos) }
-    )
-
     init {
         recyclerView.layoutManager = LinearLayoutManager(recyclerView.context)
-        recyclerView.adapter        = adapter
+        recyclerView.adapter = adapter
 
-        recyclerView.addOnItemTouchListener(dragHelper)
+        ItemTouchHelper(swipeCallback).attachToRecyclerView(recyclerView)
 
         recyclerView.addItemDecoration(object : RecyclerView.ItemDecoration() {
-            override fun getItemOffsets(
-                outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State
-            ) { outRect.top = 2.dp; outRect.bottom = 2.dp }
+            override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
+                outRect.top    = 2.dp
+                outRect.bottom = 2.dp
+            }
         })
 
         pathView.setOnClickListener { onActivated(this) }
-        loadDirectory(currentDir)
+
+        clearSelectionChip.setOnClickListener { exitSelectionMode() }
+        clearSelectionChip.visibility = View.GONE
+
+        loadDirectory(File("/storage/emulated/0/").also { currentDir = it })
     }
 
     fun loadDirectory(dir: File) {
         val targetDir = if (dir.isDirectory) dir else dir.parentFile ?: dir
         currentDir    = targetDir
         pathView.text = currentDir.absolutePath
-
-        dragHelper.cancel()
 
         recyclerView.alpha      = 0f
         recyclerView.visibility = View.INVISIBLE
@@ -104,8 +166,11 @@ class FilePanelController(
     private fun handleItemClick(item: FileItem) {
         onActivated(this)
         if (selectionMode) {
-            if (!item.isParentLink) adapter.toggleSelection(item)
-            if (!adapter.isAnySelected()) exitSelectionMode()
+            if (!item.isParentLink) {
+                adapter.toggleSelection(item)
+                if (!adapter.isAnySelected()) exitSelectionMode()
+                else updateClearChip()
+            }
             return
         }
         when {
@@ -114,31 +179,34 @@ class FilePanelController(
         }
     }
 
-    private fun handleItemLongClick(anchorView: View, item: FileItem, position: Int): Boolean {
+    private fun handleItemLongClick(anchorView: View, item: FileItem): Boolean {
         if (item.isParentLink) return false
         onActivated(this)
 
-        if (!selectionMode) {
-            selectionMode = true
-            adapter.setSelectionModeEnabled(true)
+        val isSelected = adapter.isItemSelected(item)
+
+        if (isSelected) {
+            val files = adapter.getSelectedItems().map { it.file }
+            onContextMenu(anchorView, null, files, this)
+        } else {
+            onContextMenu(anchorView, item, listOf(item.file), this)
         }
-
-        adapter.setItemSelected(position, true)
-
-        dragHelper.startDragSelect(position)
-
-        onContextMenu(anchorView, item, this)
         return true
     }
 
     fun exitSelectionMode() {
         selectionMode = false
-        dragHelper.cancel()
         adapter.setSelectionModeEnabled(false)
         adapter.clearSelection()
+        clearSelectionChip.visibility = View.GONE
     }
 
     fun getSelectedFiles(): List<File> = adapter.getSelectedItems().map { it.file }
+
+    private fun updateClearChip() {
+        clearSelectionChip.visibility =
+            if (adapter.isAnySelected()) View.VISIBLE else View.GONE
+    }
 
     fun setActive(active: Boolean) {
         val ctx = pathView.context
@@ -162,7 +230,7 @@ class FilePanelController(
 
     private fun buildFileList(dir: File): List<FileItem> {
         val children = dir.listFiles()?.toList() ?: emptyList()
-        val dirs  = children.filter  { it.isDirectory }.sortedBy { it.name.lowercase() }.map { FileItem(it) }
+        val dirs  = children.filter  { it.isDirectory  }.sortedBy { it.name.lowercase() }.map { FileItem(it) }
         val files = children.filter  { !it.isDirectory }.sortedBy { it.name.lowercase() }.map { FileItem(it) }
         return buildList {
             dir.parentFile?.let { add(FileItem(dir, isParentLink = true)) }

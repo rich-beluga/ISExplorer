@@ -135,11 +135,25 @@ enum class FileCategory(
         MaterialR.attr.colorSecondaryContainer,
         MaterialR.attr.colorOnSecondaryContainer
     ),
+    CODE(
+        R.drawable.ic_type_shell,
+        MaterialR.attr.colorSecondaryContainer,
+        MaterialR.attr.colorOnSecondaryContainer
+    ),
     
-    
-    /* zip, rar, etc archives */
+    /* archives */
     ARCHIVE(
         R.drawable.ic_type_archive,
+        MaterialR.attr.colorTertiaryContainer,
+        MaterialR.attr.colorOnTertiaryContainer
+    ),
+    ZIP(
+        R.drawable.ic_type_zip,
+        MaterialR.attr.colorTertiaryContainer,
+        MaterialR.attr.colorOnTertiaryContainer
+    ),
+    RAR(
+        R.drawable.ic_type_rar,
         MaterialR.attr.colorTertiaryContainer,
         MaterialR.attr.colorOnTertiaryContainer
     ),

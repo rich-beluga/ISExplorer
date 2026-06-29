@@ -73,7 +73,7 @@ object FileTypeRegistry {
         "cc"           to FileCategory.CPP,
         "h"            to FileCategory.CPP,
         "hpp"          to FileCategory.CPP,
-        "go"           to FileCategory.GO,
+        "go"           to FileCategory.GOLANG,
         "rb"           to FileCategory.CODE,
         "php"          to FileCategory.PHP,
         "swift"        to FileCategory.CODE,

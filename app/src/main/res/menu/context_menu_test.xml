@@ -1,21 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <item android:id="@+id/ishak_pet"
-        android:title="@string/ishak_pet" />
-
-    <item android:id="@+id/ishak_feed"
-        android:title="@string/ishak_feed" />
-
-    <item android:id="@+id/ishak_ride"
-        android:title="@string/ishak_ride" />
-
-    <item android:id="@+id/ishak_rename"
-        android:title="@string/ishak_rename" />
-
-    
-    <item android:id="@+id/ishak_delete"
-        android:title="@string/ishak_delete_action" />
-
+    <item android:id="@+id/ishak_pet"    android:title="Погладить ишака" />
+    <item android:id="@+id/ishak_feed"   android:title="Покормить ишака" />
+    <item android:id="@+id/ishak_ride"   android:title="Оседлать ишака" />
+    <item android:id="@+id/ishak_rename" android:title="Переименовать в «Буцефал»" />
+    <item android:id="@+id/ishak_delete" android:title="Удалить (не жалко)" />
 </menu>
